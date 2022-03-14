@@ -5,7 +5,7 @@ import java.util.*;
 public class Game {
     private List<Player> players = new ArrayList<>();
     private Deck deck;
-    private float pot;
+    private Pot pot = new Pot();
     private float prevBet =0;
 
     public List<Player> getPlayers() {
@@ -103,71 +103,73 @@ public class Game {
         decideWinningHand();
     }
 
-    public List<Player> decideWinningHand(){
-        double rank =-1;
+    public List<Player> decideWinningHand(){ // To be removed (implemented in Pot)
+        double minHandScore =-1;
         List<Player> winningPlayersList = new ArrayList<>();
-        Player winningPlayer = new Player();
+        Player qualifiedPlayer = new Player();
 
         for (Player player : players){
             if(!player.isHasFolded()){
-                if (player.getHand().getScore()>rank){
-                    rank = player.getHand().getScore();
-                    winningPlayer=player;
+                if (player.getHand().getScore()>minHandScore){
+                    minHandScore = player.getHand().getScore();
+                    qualifiedPlayer=player;
                     winningPlayersList.clear();
                     winningPlayersList.add(player);
                 }
-                else if (player.getHand().getScore()==rank){
-                    if (player.getHand().compareTo(winningPlayer.getHand())>0){
-                        winningPlayer=player;
+                else if (player.getHand().getScore()==minHandScore){ //  then compare Kickers
+                    if (player.getHand().compareTo(qualifiedPlayer.getHand())>0){ // if Kicker is bigger
+                        qualifiedPlayer=player;
                         winningPlayersList.clear();
                         winningPlayersList.add(player);
                     }
-                    else if (player.getHand().compareTo(winningPlayer.getHand())==0)
+                    else if (player.getHand().compareTo(qualifiedPlayer.getHand())==0)  // else if same Kickers
                         winningPlayersList.add(player);
                 }
             }
 
-            }
-        System.out.println("Winning Players are "+winningPlayersList);
-    return winningPlayersList;
+        }
+        System.out.println("Winners are ---->>"+winningPlayersList);
+        return winningPlayersList;
     }
 
     public void play(){
-        int remainingPlayers=players.size();
-        deck = new Deck();
-        pot=0;
-        int choice;
-        int i;
+        players.forEach(p-> pot.getPlayers().add(p)); // adding players to the POT playersList
+        int activePlayers = players.size(); //  (!hasFolded  && !isAllin) > 1
+        deck = new Deck(); // init Deck
+        pot.setPotSize(0); //init Pot Size
+        int choice; // Menu choice
+        int i; // Player counter
         Scanner input = new Scanner(System.in);
-        int j=0;
-        while(j<4 && players.stream().filter(player -> !player.isHasFolded()).count()>1) {
+        int j=0; // Round counter
+
+        while(j<4 && players.stream().filter(player -> !player.isHasFolded()).count()>1) { // At least 2 players are committed
             prevBet=0;
             switch (j){
                 case 0:{
-                    System.out.println("----------PreFlop------------ Pot :"+pot);
+                    System.out.println("----------PreFlop------------ Pot :"+pot.getPotSize());
                     dealPreFlop();
                     break;
                 }
                 case 1: {
-                    System.out.println("----------Flop------------ Pot :"+pot);
+                    System.out.println("----------Flop------------ Pot :"+pot.getPotSize());
                     dealFlop();
                     break;
                 }
                 case 2: {
-                    System.out.println("----------Turn------------ Pot :"+pot);
+                    System.out.println("----------Turn------------ Pot :"+pot.getPotSize());
                     dealTurn();
                     break;
                 }
                 case 3: {
-                    System.out.println("----------River ------------ Pot :"+pot);
+                    System.out.println("----------River ------------ Pot :"+pot.getPotSize());
                     dealRiver();
                     break;
                 }
             }
 
-            i=0;
-            if(remainingPlayers>1){
-                while(i < players.size() && !players.get(i).isHasPlayed()) {
+            if(activePlayers>1){ // (!hasFolded  || !isAllin) > 1
+                i=0;
+                while(i < players.size() && !players.get(i).isHasPlayed()) { // if Player[i] hasn't made a move
                     choice = 0;
                     if (!players.get(i).isHasFolded()) {
                         System.out.print(players.get(i) + "\t\t");
@@ -184,27 +186,26 @@ public class Game {
                                 choice = input.nextInt();
                             }
                             switch (choice) {
-                                case 1: {
+                                case 1: { // CHECK
                                     players.get(i).check();
                                     break;
                                 }
-                                case 2: {
+                                case 2: { // CALL
                                     players.get(i).call(prevBet);
-                                    if (players.get(i).getChips() == 0)
-                                        remainingPlayers--;
-                                    if (remainingPlayers == 1)
-                                        remainingPlayers--;
+                                    if (players.get(i).isAllIn()) {
+                                        activePlayers--;
+                                    }
                                     break;
                                 }
-                                case 3: {
+                                case 3: { // BET / RAISE
                                     prevBet = players.get(i).raise(prevBet, players);
-                                    if (players.get(i).getChips() == 0)
-                                        remainingPlayers--;
+                                    if (players.get(i).isAllIn())
+                                        activePlayers--;
                                     break;
                                 }
-                                case 4: {
+                                case 4: { // FOLD
                                     players.get(i).fold();
-                                    remainingPlayers--;
+                                    activePlayers--;
                                     break;
                                 }
                             }
@@ -212,33 +213,34 @@ public class Game {
                     }
                     System.out.println("");
                     i++;
-                    if (i == players.size() && remainingPlayers > 1)
+                    if (i == players.size() && activePlayers > 1) // if there's a BET/RAISE
                         i = 0;
-                }
+                }// All Players have made their move
             }
-            j++;
-            for(Player player: players){
+
+            for(Player player: players){ // Preparing for the next CARD
                 player.setHasPlayed(false);
-                pot+=player.getCurrentBet();
+                player.setPotContribution(player.getPotContribution()+ player.getCurrentBet());
+                pot.setPotSize(pot.getPotSize()+player.getCurrentBet());
                 player.setCurrentBet(0);
             }
-        }
-        for(Player p : players){
+            j++; // Deal next Round
+        } // Hand is Over
+
+        for(Player p : players){ // Evaluating Players Hands
             if (!p.isHasFolded()){
                 System.out.print(p+"\t\t");
                 System.out.println(p.getHand().getHandCards());
                 System.out.println("player "+p.getId()+"\t"+p.getHand().evaluateHand()+ "\tScore :"+p.getHand().getScore());
             }
         }
-        System.out.println("Pot :"+pot);
-        List<Player> winningPlayers = new ArrayList<>();
-        winningPlayers=decideWinningHand();
-        for (Player player : winningPlayers){
-            player.setChips(pot/ winningPlayers.size());
-            System.out.println(player);
+
+        pot.distributeChips(); // Distribute Chips
+        System.out.println(players);
+
+        for (Player player : players){
+            player.setPotContribution(0);
         }
-
-
-
+        // Ready for the next Hand
     }
 }

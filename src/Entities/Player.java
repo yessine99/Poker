@@ -12,6 +12,7 @@ public class Player {
     private boolean isAllIn;
     private boolean hasPlayed;
     private float currentBet;
+    private float potContribution;
 
     public Player(int id) {
 
@@ -20,6 +21,16 @@ public class Player {
         hasPlayed=false;
         isAllIn=false;
         chips=id*1000;
+        potContribution=0;
+        currentBet=0;
+    }
+
+    public float getPotContribution() {
+        return potContribution;
+    }
+
+    public void setPotContribution(float potContribution) {
+        this.potContribution = potContribution;
     }
 
     public Hand getHand() {
@@ -64,22 +75,25 @@ public class Player {
         System.out.print("Amount :"+prevBet*2+" + :");
         amount = input.nextFloat()+prevBet*2;
 
-        chips-=amount - currentBet;
-        if (chips==0){
+        if (amount - currentBet >=chips){
             isAllIn=true;
             currentBet+=chips;
+            chips=0;
         }
-
-        currentBet=amount;
+        else
+        {
+            currentBet=amount;
+            chips-=currentBet;
+        }
+        System.out.println(currentBet);
         players.stream().filter(player-> !player.isHasFolded()).forEach(player->player.setHasPlayed(false));
         hasPlayed=true;
-
         return amount;
     }
 
     public void call(float amount){
         if (amount>=chips){
-            currentBet=chips;
+            currentBet+=chips;
             chips=0;
             isAllIn=true;
         }
@@ -104,7 +118,7 @@ public class Player {
         if (this == o) return true;
         if (!(o instanceof Player)) return false;
         Player player = (Player) o;
-        return id == player.id;
+        return id == player.getId();
     }
 
     public int getId() {
@@ -118,6 +132,7 @@ public class Player {
         return "Player{" +
                 "id=" + id +
                 ", chips=" + chips+
+                ",Pot contribution ="+potContribution+
                 '}';
     }
 

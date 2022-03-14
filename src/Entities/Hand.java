@@ -20,7 +20,7 @@ public class Hand implements Comparable<Hand>{
     }
 
     public boolean isPair(){
-        for (int i=0; i<hand.size()-2;i++){
+        for (int i=0; i<hand.size()-1;i++){
             if (hand.get(i).getValue()==hand.get(i+1).getValue()){
                 score=Rank.Pair.ordinal()*100000+Math.pow(2,hand.get(i).getValue())*2;
                 return true;
