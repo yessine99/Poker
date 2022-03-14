@@ -133,6 +133,7 @@ public class Game {
     }
 
     public void play(){
+        int remainingPlayers=players.size();
         deck = new Deck();
         pot=0;
         int choice;
@@ -165,44 +166,55 @@ public class Game {
             }
 
             i=0;
-            while(i<players.size() && !players.get(i).isHasPlayed() && players.stream().filter(player -> !player.isHasFolded()).count()>1 ){
-                choice=0;
-                if(!players.get(i).isHasFolded()){
-                    System.out.print(players.get(i)+"\t\t");
-                    System.out.println(players.get(i).getHand().getHandCards());
-                    while (choice <1 ||  choice>5){
-                        if(prevBet==0)
-                            System.out.print("(1)Check\t\t");
-                        else
-                            System.out.print("(2)Call :"+(prevBet-players.get(i).getCurrentBet())+"\t\t");
-                        System.out.print("(3)Bet/Raise\t\t");
-                        System.out.print("(4)Fold\t\t");
-                        System.out.print("Choice :\t\t:");
-                        choice = input.nextInt();
+            if(remainingPlayers>1){
+                while(i < players.size() && !players.get(i).isHasPlayed()) {
+                    choice = 0;
+                    if (!players.get(i).isHasFolded()) {
+                        System.out.print(players.get(i) + "\t\t");
+                        System.out.println(players.get(i).getHand().getHandCards());
+                        if (!players.get(i).isAllIn()) {
+                            while ((choice < 1 || choice > 5)) {
+                                if (prevBet == 0)
+                                    System.out.print("(1)Check\t\t");
+                                else
+                                    System.out.print("(2)Call :" + (prevBet - players.get(i).getCurrentBet()) + "\t\t");
+                                System.out.print("(3)Bet/Raise\t\t");
+                                System.out.print("(4)Fold\t\t");
+                                System.out.print("Choice :\t\t:");
+                                choice = input.nextInt();
+                            }
+                            switch (choice) {
+                                case 1: {
+                                    players.get(i).check();
+                                    break;
+                                }
+                                case 2: {
+                                    players.get(i).call(prevBet);
+                                    if (players.get(i).getChips() == 0)
+                                        remainingPlayers--;
+                                    if (remainingPlayers == 1)
+                                        remainingPlayers--;
+                                    break;
+                                }
+                                case 3: {
+                                    prevBet = players.get(i).raise(prevBet, players);
+                                    if (players.get(i).getChips() == 0)
+                                        remainingPlayers--;
+                                    break;
+                                }
+                                case 4: {
+                                    players.get(i).fold();
+                                    remainingPlayers--;
+                                    break;
+                                }
+                            }
+                        }
                     }
-                    switch (choice){
-                        case 1: {
-                            players.get(i).check();
-                            break;
-                        }
-                        case 2: {
-                            players.get(i).call(prevBet);
-                            break;
-                        }
-                        case 3: {
-                            prevBet = players.get(i).raise(prevBet, players);
-                            break;
-                        }
-                        case 4: {
-                            players.get(i).fold();
-                            break;
-                        }
-                    }
+                    System.out.println("");
+                    i++;
+                    if (i == players.size() && remainingPlayers > 1)
+                        i = 0;
                 }
-                System.out.println("");
-                i++;
-                if(i==players.size())
-                    i=0;
             }
             j++;
             for(Player player: players){
@@ -213,6 +225,8 @@ public class Game {
         }
         for(Player p : players){
             if (!p.isHasFolded()){
+                System.out.print(p+"\t\t");
+                System.out.println(p.getHand().getHandCards());
                 System.out.println("player "+p.getId()+"\t"+p.getHand().evaluateHand()+ "\tScore :"+p.getHand().getScore());
             }
         }

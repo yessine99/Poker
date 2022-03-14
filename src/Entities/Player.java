@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Player {
+
     private int id;
     private Hand hand = new Hand();
     private float chips;
@@ -12,18 +13,29 @@ public class Player {
     private boolean hasPlayed;
     private float currentBet;
 
-
-
-    public Hand getHand() {
-        return hand;
-    }
-
     public Player(int id) {
 
         this.id = id;
         hasFolded =false;
         hasPlayed=false;
-        chips=500000;
+        isAllIn=false;
+        chips=id*1000;
+    }
+
+    public Hand getHand() {
+        return hand;
+    }
+
+    public float getChips() {
+        return chips;
+    }
+
+    public void setChips(float chips) {
+        this.chips += chips;
+    }
+
+    public boolean isAllIn() {
+        return isAllIn;
     }
 
     public float getCurrentBet() {
@@ -47,30 +59,29 @@ public class Player {
     }
 
     public float raise(float prevBet, List<Player> players){
-        float amount=0;
+        float amount;
         Scanner input = new Scanner(System.in);
         System.out.print("Amount :"+prevBet*2+" + :");
         amount = input.nextFloat()+prevBet*2;
+
         chips-=amount - currentBet;
-        if (chips==0)
+        if (chips==0){
             isAllIn=true;
+            currentBet+=chips;
+        }
+
         currentBet=amount;
-        players.stream().forEach(player->player.setHasPlayed(false));
+        players.stream().filter(player-> !player.isHasFolded()).forEach(player->player.setHasPlayed(false));
         hasPlayed=true;
 
         return amount;
     }
 
-
-    public void setChips(float chips) {
-        this.chips += chips;
-    }
-
     public void call(float amount){
         if (amount>=chips){
+            currentBet=chips;
             chips=0;
             isAllIn=true;
-            currentBet=chips;
         }
         else {
             chips -= amount - currentBet;

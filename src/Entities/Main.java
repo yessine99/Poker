@@ -4,7 +4,7 @@ import java.util.Collections;
 
 public class Main {
     public static void main(String[] args) {
-        //specific hand testing
+        //specific Hand testing
         /*Deck deck = new Deck();
         Hand hand = new Hand();
         hand.getHandCards().add(new Card(8,CardSuit.Spades.toString()));
@@ -29,15 +29,15 @@ public class Main {
         Player p1 = new Player(1);
         Player p2 = new Player(2);
         Player p3 = new Player(3);
-        Player p4 = new Player(4);
+        //Player p4 = new Player(4);
         game.getPlayers().add(p1);
         game.getPlayers().add(p2);
         game.getPlayers().add(p3);
-        game.getPlayers().add(p4);
+        //game.getPlayers().add(p4);
 
 
-        game.run(); // hand evaluator
-        //game.play(); //  hand simulation , "All in" missing
+        //game.run(); // hand evaluator
+        game.play(); //  hand simulation
 
     }
 }
