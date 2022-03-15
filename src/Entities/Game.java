@@ -12,14 +12,14 @@ public class Game {
         return players;
     }
 
-    public void dealPreFlop(){
+    private void dealPreFlop(){
         Iterator<Card> it = deck.getDeck().iterator();
         int i=0;
         int j=0;
         Card card = new Card();
         while (it.hasNext() && i<(players.size()*2) ){
             card=it.next();
-            players.get(j).getHand().getHandCards().add(card);
+            players.get(j).getHand().getCards().add(card);
             it.remove();
             i++;
             j++;
@@ -29,11 +29,11 @@ public class Game {
         }
     }
 
-    public void burnCard(){
+    private void burnCard(){
         deck.getDeck().remove(0);
     }
 
-    public void dealFlop(){
+    private void dealFlop(){
         burnCard();
         Iterator<Card> it = deck.getDeck().iterator();
         int i=0;
@@ -42,21 +42,21 @@ public class Game {
         while (it.hasNext() && i<3) {
             card= it.next();
             for (Player player : players)
-                player.getHand().getHandCards().add(card);
+                player.getHand().getCards().add(card);
             it.remove();
             i++;
         }
     }
 
-    public void dealTurn(){
+    private void dealTurn(){
         burnCard();
-        players.stream().forEach(p->p.getHand().getHandCards().add(deck.getDeck().get(0)));
+        players.stream().forEach(p->p.getHand().getCards().add(deck.getDeck().get(0)));
         deck.getDeck().remove(0);
     }
 
-    public void dealRiver(){
+    private void dealRiver(){
         burnCard();
-        players.stream().forEach(p->p.getHand().getHandCards().add(deck.getDeck().get(0)));
+        players.stream().forEach(p->p.getHand().getCards().add(deck.getDeck().get(0)));
         deck.getDeck().remove(0);
     }
 
@@ -68,7 +68,7 @@ public class Game {
         players.forEach(p->{
             System.out.print("player "+p.getId()+":\t");
             System.out.print(p.getHand().evaluateHand()+"\t");
-            System.out.println(p.getHand().getHandCards()+ "\tScore:"+p.getHand().getScore());
+            System.out.println(p.getHand().getCards()+ "\tScore:"+p.getHand().getScore());
         });
         System.out.println("");
 
@@ -77,7 +77,7 @@ public class Game {
         players.forEach(p->{
             System.out.print("player "+p.getId()+":\t");
             System.out.print(p.getHand().evaluateHand()+"\t");
-            System.out.println(p.getHand().getHandCards()+ "\tScore:"+p.getHand().getScore());
+            System.out.println(p.getHand().getCards()+ "\tScore:"+p.getHand().getScore());
         });
         System.out.println("");
 
@@ -86,7 +86,7 @@ public class Game {
         players.forEach(p->{
             System.out.print("player "+p.getId()+":\t");
             System.out.print(p.getHand().evaluateHand()+"\t");
-            System.out.println(p.getHand().getHandCards()+ "\tScore:"+p.getHand().getScore());
+            System.out.println(p.getHand().getCards()+ "\tScore:"+p.getHand().getScore());
         });
         System.out.println("");
 
@@ -95,7 +95,7 @@ public class Game {
         players.forEach(p->{
             System.out.print("player "+p.getId()+":\t");
             System.out.print(p.getHand().evaluateHand()+"\t");
-            System.out.println(p.getHand().getHandCards()+ "\tScore:"+p.getHand().getScore());
+            System.out.println(p.getHand().getCards()+ "\tScore:"+p.getHand().getScore());
         });
         System.out.println("");
 
@@ -103,7 +103,7 @@ public class Game {
         decideWinningHand();
     }
 
-    public List<Player> decideWinningHand(){ // To be removed (implemented in Pot)
+    private List<Player> decideWinningHand(){ // To be removed (implemented in Pot)
         double minHandScore =-1;
         List<Player> winningPlayersList = new ArrayList<>();
         Player qualifiedPlayer = new Player();
@@ -133,7 +133,6 @@ public class Game {
     }
 
     public void play(){
-        players.forEach(p-> pot.getPlayers().add(p)); // adding players to the POT playersList
         int activePlayers = players.size(); //  (!hasFolded  && !isAllin) > 1
         deck = new Deck(); // init Deck
         pot.setPotSize(0); //init Pot Size
@@ -173,7 +172,7 @@ public class Game {
                     choice = 0;
                     if (!players.get(i).isHasFolded()) {
                         System.out.print(players.get(i) + "\t\t");
-                        System.out.println(players.get(i).getHand().getHandCards());
+                        System.out.println(players.get(i).getHand().getCards());
                         if (!players.get(i).isAllIn()) {
                             while ((choice < 1 || choice > 5)) {
                                 if (prevBet == 0)
@@ -230,17 +229,23 @@ public class Game {
         for(Player p : players){ // Evaluating Players Hands
             if (!p.isHasFolded()){
                 System.out.print(p+"\t\t");
-                System.out.println(p.getHand().getHandCards());
+                System.out.println(p.getHand().getCards());
                 System.out.println("player "+p.getId()+"\t"+p.getHand().evaluateHand()+ "\tScore :"+p.getHand().getScore());
             }
+            else p.setHasFolded(false);
         }
 
-        pot.distributeChips(); // Distribute Chips
+        pot.distributeChips(players); // Distribute Chips
         System.out.println(players);
 
         for (Player player : players){
             player.setPotContribution(0);
+            player.getHand().clear();
         }
-        // Ready for the next Hand
+
+
+
+    // Ready for the next Hand
+        deck.construct();
     }
 }

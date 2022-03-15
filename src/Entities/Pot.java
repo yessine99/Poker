@@ -4,10 +4,11 @@ import java.util.*;
 
 public class Pot {
     private float potSize;
-    private List<Player> players = new ArrayList<>();
 
     public Pot() {
+        potSize=0;
     }
+
 
     public float getPotSize() {
         return potSize;
@@ -17,21 +18,18 @@ public class Pot {
         this.potSize = potSize;
     }
 
-    public List<Player> getPlayers() {
-        return players;
-    }
 
 
 
 
-    private List getWinners() {
+    private List getWinners(List<Player> players, int uncheckedPlayerIndex) {
         // Players Hands must be evaluated
 
         double minHandScore =-1;
         List<Player> winningPlayersList = new ArrayList<>();
         Player qualifiedPlayer = new Player();
 
-        for (Player player : players){
+        for (Player player : players.subList(uncheckedPlayerIndex,players.size())){ // previous players are already checked
             if(!player.isHasFolded()){
                 if (player.getHand().getScore() > minHandScore){ // if has a better handScore
                     minHandScore = player.getHand().getScore();
@@ -57,7 +55,7 @@ public class Pot {
     }
 
 
-    public void distributeChips(){
+    public void distributeChips(List <Player> players){
         players.sort((p1, p2) -> {
             if (p1.getPotContribution() > p2.getPotContribution())
                 return 1;
@@ -71,44 +69,40 @@ public class Pot {
         float prevContribs = 0; // previous contributions
         float lostContribs = 0; // contributions from folds and loses
         float sidePot =0;
-        Iterator<Player> itr = players.iterator();
+        int uncheckedPlayers = players.size();
         Player player ;
+        int i=0;
+        while (  i<players.size()){
+            player = players.get(i);
+            if (potSize>0){
+                potWinners = getWinners(players,i);
+                if (potWinners.contains(player)) { // if is a winner
+                    if (potWinners.size() == 1) {
+                        sidePot += (lostContribs + (player.getPotContribution() - prevContribs) * uncheckedPlayers); // uncheckedPlayers = players.size()-i
+                        lostContribs = 0;
+                    } else {
+                        sidePot += ((lostContribs + (player.getPotContribution() - prevContribs) * uncheckedPlayers) / potWinners.size());
+                        lostContribs /= potWinners.size();
+                    }
+                    player.setChips(sidePot);
+                    potSize -= sidePot;
+                    sidePot = 0;
 
-        while (itr.hasNext() && potSize !=0){// Iterator
-            player = itr.next();
-            potWinners=getWinners();
-            if (potWinners.contains(player)){ // if is a winner
-                if (potWinners.size()==1) {
-                    sidePot+=(lostContribs + (player.getPotContribution() - prevContribs) * players.size());
-                    lostContribs = 0;
-                }
-                else {
-                    sidePot+=((lostContribs + (player.getPotContribution() - prevContribs) * players.size()) / potWinners.size());
-                    lostContribs/=potWinners.size();
-                }
-                player.setChips(sidePot);
-                potSize -=sidePot;
-                sidePot=0;
-
-                prevContribs = player.getPotContribution();
+                    prevContribs = player.getPotContribution();
+                } else // if not a winner or hasFolded
+                    lostContribs += player.getPotContribution() - prevContribs;
             }
-
-            else // if not a winner or hasFolded
-                lostContribs += player.getPotContribution()-prevContribs;
-
-            itr.remove();
-
+            player.reInit();
+            uncheckedPlayers--;
+            i++;
         }
-
+        // Pot Size should be back to 0
     }
 
 
     @Override
     public String toString() {
-        return "Pot{" +
-                "amount=" + potSize +
-                ", playersInvolved=" + players +
-                '}';
+        return "Pot Size ="+potSize;
     }
 
 }

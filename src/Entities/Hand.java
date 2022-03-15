@@ -7,7 +7,7 @@ public class Hand implements Comparable<Hand>{
     private List<Card> hand = new ArrayList<>();
     private double score;
 
-    public List<Card> getHandCards() {
+    public List<Card> getCards() {
         return hand;
     }
 
@@ -18,7 +18,10 @@ public class Hand implements Comparable<Hand>{
     public Hand() {
 
     }
-
+    public void clear(){
+        hand.clear();
+        score=0;
+    }
     public boolean isPair(){
         for (int i=0; i<hand.size()-1;i++){
             if (hand.get(i).getValue()==hand.get(i+1).getValue()){
@@ -241,8 +244,8 @@ public class Hand implements Comparable<Hand>{
     public int compareTo(Hand otherHand) {
         if(score<Rank.Straight.ordinal()*100000) // if score < Straight.score then compare Kickers
             for (int i=0; i<5;i++){
-                if (hand.get(i).getValue() != otherHand.getHandCards().get(i).getValue())
-                    return hand.get(i).getValue() - otherHand.getHandCards().get(i).getValue();
+                if (hand.get(i).getValue() != otherHand.getCards().get(i).getValue())
+                    return hand.get(i).getValue() - otherHand.getCards().get(i).getValue();
             }
         return 0;
     }

@@ -61,12 +61,28 @@ public class Player {
         return hasFolded;
     }
 
+    public void setHasFolded(boolean hasFolded) {
+        this.hasFolded = hasFolded;
+    }
+
     public boolean isHasPlayed() {
         return hasPlayed;
     }
 
     public void setHasPlayed(boolean hasPlayed) {
         this.hasPlayed = hasPlayed;
+    }
+
+    public void reInit(){ //for next hand
+        hand.clear();
+        potContribution=0;
+        // Current Bet = 0 after each round
+        if (hasFolded)
+            hasFolded=false;
+        if (isAllIn)
+            isAllIn=false;
+        if (hasPlayed)
+            hasPlayed=false;
     }
 
     public float raise(float prevBet, List<Player> players){
@@ -88,7 +104,7 @@ public class Player {
         System.out.println(currentBet);
         players.stream().filter(player-> !player.isHasFolded()).forEach(player->player.setHasPlayed(false));
         hasPlayed=true;
-        return amount;
+        return currentBet;
     }
 
     public void call(float amount){
