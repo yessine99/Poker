@@ -1,12 +1,14 @@
 package Entities;
 
+import Enums.CardSuit;
+import Enums.CardValue;
+
 import java.util.*;
 
 public class Deck {
     private List<Card> deck = new ArrayList<>();
 
     public  Deck(){
-        construct();
     }
 
     public void construct (){

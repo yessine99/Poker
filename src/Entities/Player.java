@@ -8,29 +8,28 @@ public class Player {
     private int id;
     private Hand hand = new Hand();
     private float chips;
+    private boolean hasPlayed;
     private boolean hasFolded;
     private boolean isAllIn;
-    private boolean hasPlayed;
     private float currentBet;
     private float potContribution;
 
-    public Player(int id) {
 
-        this.id = id;
+    public Player() {
+    }
+
+    public Player(int id) {
+        this.id=id;
         hasFolded =false;
         hasPlayed=false;
         isAllIn=false;
-        chips=id*1000;
+        chips=id*10000;
         potContribution=0;
         currentBet=0;
     }
 
-    public float getPotContribution() {
-        return potContribution;
-    }
-
-    public void setPotContribution(float potContribution) {
-        this.potContribution = potContribution;
+    public int getId() {
+        return id;
     }
 
     public Hand getHand() {
@@ -41,8 +40,12 @@ public class Player {
         return chips;
     }
 
-    public void setChips(float chips) {
-        this.chips += chips;
+    public boolean hasPlayed() {
+        return hasPlayed;
+    }
+
+    public boolean hasFolded() {
+        return hasFolded;
     }
 
     public boolean isAllIn() {
@@ -53,36 +56,35 @@ public class Player {
         return currentBet;
     }
 
-    public void setCurrentBet(float currentBet) {
-        this.currentBet = currentBet;
+    public float getPotContribution() {
+        return potContribution;
     }
 
-    public boolean isHasFolded() {
-        return hasFolded;
+
+    public void initForNextRound(){
+        hasPlayed = false;
+        potContribution += currentBet;
+        currentBet = 0;
     }
 
-    public void setHasFolded(boolean hasFolded) {
-        this.hasFolded = hasFolded;
+    public void setBlind(float blind){
+        currentBet = blind;
+        chips -= blind;
     }
 
-    public boolean isHasPlayed() {
-        return hasPlayed;
-    }
-
-    public void setHasPlayed(boolean hasPlayed) {
-        this.hasPlayed = hasPlayed;
-    }
-
-    public void reInit(){ //for next hand
+    public void initForNextHand(){ //for next hand
         hand.clear();
         potContribution=0;
-        // Current Bet = 0 after each round
         if (hasFolded)
             hasFolded=false;
-        if (isAllIn)
+        else if (isAllIn)
             isAllIn=false;
         if (hasPlayed)
             hasPlayed=false;
+    }
+
+    public void addChips(float chips) {
+        this.chips += chips;
     }
 
     public float raise(float prevBet, List<Player> players){
@@ -98,11 +100,10 @@ public class Player {
         }
         else
         {
-            currentBet=amount;
-            chips-=currentBet;
+            chips -= amount - currentBet;
+            currentBet = amount;
         }
         System.out.println(currentBet);
-        players.stream().filter(player-> !player.isHasFolded()).forEach(player->player.setHasPlayed(false));
         hasPlayed=true;
         return currentBet;
     }
@@ -128,7 +129,6 @@ public class Player {
     }
 
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -137,18 +137,13 @@ public class Player {
         return id == player.getId();
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public Player() {
-    }
     @Override
     public String toString() {
         return "Player{" +
                 "id=" + id +
                 ", chips=" + chips+
                 ",Pot contribution ="+potContribution+
+                ",\t\tHand :"+hand.getCards()+
                 '}';
     }
 
