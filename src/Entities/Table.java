@@ -7,7 +7,7 @@ public class Table {
     private final float blinds;
     private final float minBuyIn;
     private final float maxBuyIn;
-    private List<Boolean> seats = new ArrayList<>();
+    private final List<Boolean> seats = new ArrayList<>();
 
     public Table() {
         blinds = 100;

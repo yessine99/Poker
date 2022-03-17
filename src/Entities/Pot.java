@@ -17,7 +17,7 @@ public class Pot {
         this.potSize = potSize;
     }
 
-    public List getWinners(List<Player> players, int uncheckedPlayerIndex) {
+    public List<Player> getWinners(List<Player> players, int uncheckedPlayerIndex) {
         // Players Hands must be evaluated
 
         double minHandScore =-1;
@@ -61,7 +61,7 @@ public class Pot {
     public void evaluatePlayersHands(List <Player> players){
         for(Player p : players){ // Evaluating Players Hands
             if (!p.hasFolded()){
-                System.out.println(p+"\t\t" + p.getHand().evaluateHand()+ "\tScore :"+p.getHand().getScore());
+                System.out.println(p+"\nHand Strength :" + p.getHand().evaluateHand()+ "\tScore :"+p.getHand().getScore()+"\n");
             }
         }
     }

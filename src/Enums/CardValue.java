@@ -17,24 +17,20 @@ public enum CardValue {
 
 
     private final int cardValue;
-    private CardValue(final int cardValue){
+    CardValue(final int cardValue){
         this.cardValue=cardValue;
     }
 
     @Override
     public String toString() {
 
-            switch(cardValue){
-                case 11:
-                    return "J";
-                case 12:
-                    return "Q";
-                case 13 :
-                    return "K";
-                case 14:
-                    return "A";
-                default:return String.valueOf(cardValue);
-            }
+        return switch (cardValue) {
+            case 11 -> "J";
+            case 12 -> "Q";
+            case 13 -> "K";
+            case 14 -> "A";
+            default -> String.valueOf(cardValue);
+        };
     }
 
 }

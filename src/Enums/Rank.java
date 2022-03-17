@@ -15,7 +15,7 @@ public enum Rank { // Best 5 Cards combo score is (2^14)*4 + 2^13 = 73728 --> AA
 
     private final int rank;
 
-    private Rank(final int rank){
+    Rank(final int rank){
         this.rank=rank;
     }
 

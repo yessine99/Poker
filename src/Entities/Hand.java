@@ -6,7 +6,7 @@ import Enums.Rank;
 import java.util.*;
 
 public class Hand implements Comparable<Hand>{
-    private List<Card> hand = new ArrayList<>();
+    private final List<Card> hand = new ArrayList<>();
     private double score;
 
     public Hand() {
@@ -28,13 +28,35 @@ public class Hand implements Comparable<Hand>{
 
     @Override
     public int compareTo(Hand otherHand) { // Kickers comparaison
-        if(score<Rank.Straight.ordinal()*100000) // if score < Straight.score then compare Kickers
-            for (int i=0; i<5;i++){
+        if (score < Rank.Straight.ordinal()*100000){ // no need to compare if hand strength < straight
+            int kickers;
+            if (score < Rank.Pair.ordinal()*100000) // High Card
+                kickers = 5;
+            else if (score < Rank.TwoPairs.ordinal()*100000) // Pair
+                kickers = 3;
+            else if  (score < Rank.ThreeOfAKind.ordinal()*100000) // Two Pair
+                kickers=1;
+            else
+                kickers =2; // ThreeOfAKind
+
+            int i=0;
+            int counter =0;
+
+            while ( i < 5 && counter !=kickers){
                 if (hand.get(i).getValue() != otherHand.getCards().get(i).getValue())
                     return hand.get(i).getValue() - otherHand.getCards().get(i).getValue();
+                else if ( hand.get(i).getValue() == hand.get(i+1).getValue())
+                    i++;
+                else
+                    counter ++;
+
+                i++;
             }
+        }
+
         return 0;
     }
+
 
 
     public boolean isPair(){
@@ -50,15 +72,12 @@ public class Hand implements Comparable<Hand>{
     public boolean isTwoPair(){
         int counter = 0;
         int tmpScore=0;
-        if  (hand.get(0).getValue()==hand.get(1).getValue()){
-            tmpScore+= Math.pow(2,hand.get(0).getValue())*2;
-            counter++;
-        }
 
-        for (int i=counter+1; i<hand.size()-1;i++){
-            if(hand.get(i).getValue()==hand.get(i+1).getValue() && hand.get(i).getValue()!=hand.get(i-1).getValue()){
+        for (int i=0; i<hand.size()-1;i++){
+            if(hand.get(i).getValue()==hand.get(i+1).getValue()){
                 tmpScore+= Math.pow(2,hand.get(i).getValue())*2;
                 counter++;
+                i++;
                 if (counter==2){
                     score =Rank.TwoPairs.ordinal()*100000+tmpScore;
                     return true;
@@ -119,10 +138,9 @@ public class Hand implements Comparable<Hand>{
                 isThreeOfAKind=true;
                 tmpScore+=Math.pow(2,hand.get(i).getValue())*3;
             }
-
             else if (counter >1 && !isPair){
                 isPair=true;
-                tmpScore+=(Math.pow(2,hand.get(i).getValue())*2)/16384;
+                tmpScore+=(Math.pow(2,hand.get(i).getValue())*2)/16384; // /2^14 to keep the Three of a King the first determiner
             }
 
             i+=counter;
@@ -207,7 +225,7 @@ public class Hand implements Comparable<Hand>{
             for (i= 0 ; i<flushList.size()-1;i++)
                 if(flushList.get(i).getValue()==flushList.get(i+1).getValue()+1){
                     counter ++;
-                    if (counter == 4 && flushList.get(i+1).getValue()==2 && flushList.get(0).getValue()==14){
+                    if (counter == 4 && flushList.get(i+1).getValue()==2 && flushList.get(0).getValue()==14){ // A + 2345
                         score =Rank.StraightFlush.ordinal()*100000+15;
                         return true;
                     }
@@ -222,7 +240,7 @@ public class Hand implements Comparable<Hand>{
     }
 
     public String evaluateHand(){
-        Collections.sort(hand,Collections.reverseOrder()); // Hand must be sorted in DESC order
+        hand.sort(Collections.reverseOrder()); // Hand must be sorted in DESC order
 
         if (isStraightFlush())
             return "Straight Flush";

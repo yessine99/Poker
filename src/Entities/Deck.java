@@ -6,7 +6,7 @@ import Enums.CardValue;
 import java.util.*;
 
 public class Deck {
-    private List<Card> deck = new ArrayList<>();
+    private final List<Card> deck = new ArrayList<>();
 
     public  Deck(){
     }

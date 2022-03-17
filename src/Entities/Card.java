@@ -43,16 +43,12 @@ public class Card implements Comparable<Card> {
 
     @Override
     public String toString() {
-         switch(value){
-            case 11:
-                return "J of "+suit;
-            case 12:
-                return "Q of "+suit;
-            case 13 :
-                return "K of "+suit;
-            case 14:
-                return "A of "+suit;
-            default:return String.valueOf(value)+" of "+suit;
-        }
+        return switch (value) {
+            case 11 -> "J of " + suit;
+            case 12 -> "Q of " + suit;
+            case 13 -> "K of " + suit;
+            case 14 -> "A of " + suit;
+            default -> value + " of " + suit;
+        };
     }
 }

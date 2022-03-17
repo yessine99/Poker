@@ -1,12 +1,11 @@
 package Entities;
 
-import java.util.List;
 import java.util.Scanner;
 
 public class Player {
 
     private int id;
-    private Hand hand = new Hand();
+    private final Hand hand = new Hand();
     private float chips;
     private boolean hasPlayed;
     private boolean hasFolded;
@@ -87,7 +86,7 @@ public class Player {
         this.chips += chips;
     }
 
-    public float raise(float prevBet, List<Player> players){
+    public float raise(float prevBet){
         float amount;
         Scanner input = new Scanner(System.in);
         System.out.print("Amount :"+prevBet*2+" + :");
