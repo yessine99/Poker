@@ -6,6 +6,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Objects;
 
+/**
+ *  Class is for handling the client's moves ( check / call / raise / fold )
+ */
 public class ClientHandler{
 
     private final String username;
@@ -45,16 +48,48 @@ public class ClientHandler{
         return player;
     }
 
+    /**
+     * Updates the player's state ( chips , hand ... )
+     * @throws IOException handled by {@link GameHandler#closeEverything(ClientHandler)}
+     */
     public void updatePlayer() throws IOException {
             objectOutputStream.reset();
             objectOutputStream.writeObject(player);
             objectOutputStream.flush();
     }
 
+    /**
+     * Sends a Boolean object to the client to take his turn
+     * @throws IOException handled by {@link GameHandler#closeEverything(ClientHandler)}
+     */
     public void takeTurn() throws IOException {
             objectOutputStream.reset();
             objectOutputStream.writeObject(true);
             objectOutputStream.flush();
+    }
+
+    /**
+     * method for reading the client's turn input
+     * @param gameState updates the gameState depending on the player's action
+     * @return returns fold by default
+     * @throws IOException handled by {@link GameHandler#closeEverything(ClientHandler)}
+     * @throws ClassNotFoundException handled by {@link GameHandler#closeEverything(ClientHandler)}
+     */
+    public String readTurn(GameState gameState) throws IOException, ClassNotFoundException {
+        Object object = objectInputStream.readObject();
+        if (object instanceof ClientInput){
+            switch (((ClientInput) object).getAction()) {
+                case "Check":
+                    return check();
+                case "Fold":
+                    return fold(gameState);
+                case "Call":
+                    return call(gameState);
+                case "Raise":
+                    return raise(gameState, (ClientInput) object);
+            }
+        }
+        return fold(gameState);
     }
 
     public String raise(GameState gameState, ClientInput clientInput){
@@ -102,22 +137,7 @@ public class ClientHandler{
         return username + " Check";
     }
 
-    public String readTurn(GameState gameState) throws IOException, ClassNotFoundException {
-            Object object = objectInputStream.readObject();
-            if (object instanceof ClientInput){
-                switch (((ClientInput) object).getAction()) {
-                    case "Check":
-                        return check();
-                    case "Fold":
-                        return fold(gameState);
-                    case "Call":
-                        return call(gameState);
-                    case "Raise":
-                        return raise(gameState, (ClientInput) object);
-                }
-            }
-            return fold(gameState);
-    }
+
 
     @Override
     public boolean equals(Object o) {

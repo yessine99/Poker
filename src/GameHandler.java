@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Class for handling the game loop
+ */
 public class GameHandler{
 
     private final List<ClientHandler>  clientHandlerList = new ArrayList<>();
@@ -18,6 +21,9 @@ public class GameHandler{
         return clientHandlerList;
     }
 
+    /**
+     * Broadcasts the current gameState to all clients in this game
+     */
     public void broadcastGameState(){
         for (ClientHandler clientHandler : clientHandlerList)
             try{
@@ -31,6 +37,9 @@ public class GameHandler{
             }
     }
 
+    /**
+     * Updates all the players states
+     */
     public void updatePlayers(){
         for (ClientHandler clientHandler : clientHandlerList) {
             try {
@@ -42,6 +51,9 @@ public class GameHandler{
         }
     }
 
+    /**
+     * Initializes a client, adds him to this game and starts the game with {@link #startGame()} if the requirements are met
+     */
     public void initializeClient(ClientHandler clientHandler){
         try{
             clientHandler.getObjectOutputStream().writeObject(clientHandlerList.size()-1); // player ID
@@ -59,6 +71,9 @@ public class GameHandler{
         }
     }
 
+    /**
+     * Broadcasts a string to all the clients except the sender
+     */
     public void broadcastMessage(String message, ClientHandler sender){
         for (ClientHandler clientHandler : clientHandlerList)
             if(!clientHandler.equals(sender))
@@ -72,6 +87,9 @@ public class GameHandler{
             }
     }
 
+    /**
+     * Broadcasts a String to all the clients
+     */
     public void broadcastMessage(String message){
         for (ClientHandler clientHandler : clientHandlerList)
                 try{
@@ -84,19 +102,24 @@ public class GameHandler{
                 }
     }
 
-    public void sendMessage(ClientHandler clientHandler , String message){
+    /**
+     * Sends a String to a specific Client
+     */
+    public void sendMessage(ClientHandler receiver , String message){
         try{
-            clientHandler.getObjectOutputStream().reset();
-            clientHandler.getObjectOutputStream().writeObject(message);
-            clientHandler.getObjectOutputStream().flush();
+            receiver.getObjectOutputStream().reset();
+            receiver.getObjectOutputStream().writeObject(message);
+            receiver.getObjectOutputStream().flush();
         }catch (IOException e){
             e.getStackTrace();
-            closeEverything(clientHandler);
+            closeEverything(receiver);
         }
     }
 
+    /**
+     * Handles the exceptions by closing the client's socket and removing him from this game
+     */
     public void closeEverything(ClientHandler clientHandler) {
-
         clientHandlerList.remove(clientHandler);
         broadcastMessage(clientHandler.getUsername() + " has left the table!");
         try {
@@ -108,6 +131,9 @@ public class GameHandler{
         }
     }
 
+    /**
+     * Initialize the gameState and players states
+     */
     public void initHand(){
         gameState.getDeck().construct();
         gameState.setPot(0);
@@ -249,13 +275,14 @@ public class GameHandler{
         pot.setPotSize(gameState.getPot());
         pot.distributeChips();
 
-
         broadcastMessage("Hand is Over!");
         System.out.println("Players after chips distribution :");
         clientHandlerList.forEach(clientHandler -> System.out.println(clientHandler.getPlayer()));
     }
 
-
+    /**
+     * Subclass to handle the pot distribution
+     */
     public class Pot  {
         private float potSize;
 
@@ -271,6 +298,10 @@ public class GameHandler{
             this.potSize = potSize;
         }
 
+        /**
+         * Used in the {@link #distributeChips()} in order to get the winners list  of each subPot
+         * @param uncheckedPlayerIndex player from which the subList should be extracted
+         */
         public List<Player> getWinners(int uncheckedPlayerIndex) {
             // Players Hands must be evaluated
 
@@ -302,6 +333,7 @@ public class GameHandler{
             return winningPlayersList;
 
         }
+
         public void sortPlayersByPotContributionASC(){
             clientHandlerList.sort((p1, p2) -> {
                 if (p1.getPlayer().getPotContribution() > p2.getPlayer().getPotContribution())
