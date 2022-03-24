@@ -52,7 +52,7 @@ public class GameHandler{
     }
 
     /**
-     * Initializes a client, adds him to this game and starts the game with {@link #startGame()} if the requirements are met
+     * Initializes a client, adds him to this game and starts it if the requirements are met (min players = 3)
      */
     public void initializeClient(ClientHandler clientHandler){
         try{
@@ -72,7 +72,7 @@ public class GameHandler{
     }
 
     /**
-     * Broadcasts a string to all the clients except the sender
+     * Broadcasts a string to all clients except the sender
      */
     public void broadcastMessage(String message, ClientHandler sender){
         for (ClientHandler clientHandler : clientHandlerList)
@@ -88,7 +88,7 @@ public class GameHandler{
     }
 
     /**
-     * Broadcasts a String to all the clients
+     * Broadcasts a string to all clients
      */
     public void broadcastMessage(String message){
         for (ClientHandler clientHandler : clientHandlerList)
@@ -103,7 +103,7 @@ public class GameHandler{
     }
 
     /**
-     * Sends a String to a specific Client
+     * Sends a string to a specific Client
      */
     public void sendMessage(ClientHandler receiver , String message){
         try{
@@ -132,7 +132,7 @@ public class GameHandler{
     }
 
     /**
-     * Initialize the gameState and players states
+     * Initializes the gameState and the players states
      */
     public void initHand(){
         gameState.getDeck().construct();
@@ -225,6 +225,10 @@ public class GameHandler{
         gameState.getDeck().getDeck().remove(0);
     }
 
+    /**
+     * This is the betting round loop, notifies the player to take turn if he has to with : {@link ClientHandler#takeTurn()}
+     * @param i is the first player who has to take his turn in a given round
+     */
     public void startBettingRound(int i){
         String action;
         while ( i < clientHandlerList.size() && gameState.getFoldedPlayers() < clientHandlerList.size()-1 && ( clientHandlerList.get(i).getPlayer().getCurrentBet() != gameState.getPrevBet() || !clientHandlerList.get(i).getPlayer().hasPlayed() ) ){
@@ -299,7 +303,7 @@ public class GameHandler{
         }
 
         /**
-         * Used in the {@link #distributeChips()} in order to get the winners list  of each subPot
+         * Used in {@link #distributeChips()} in order to get the winners list  of each subPot
          * @param uncheckedPlayerIndex player from which the subList should be extracted
          */
         public List<Player> getWinners(int uncheckedPlayerIndex) {
@@ -352,6 +356,9 @@ public class GameHandler{
             }
         }
 
+        /**
+         * Distributes the chips to the winners depending on their Pot Contribution
+         */
         public void distributeChips(){
             evaluatePlayersHands();
             sortPlayersByPotContributionASC();

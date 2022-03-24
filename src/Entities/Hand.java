@@ -58,8 +58,6 @@ public class Hand implements Comparable<Hand> , Serializable {
         return 0;
     }
 
-
-
     public boolean isPair(){
         for (int i=0; i<hand.size()-1;i++){
             if (hand.get(i).getValue()==hand.get(i+1).getValue()){

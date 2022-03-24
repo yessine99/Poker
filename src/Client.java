@@ -6,6 +6,9 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
+/**
+ * This class handles the client's IO
+ */
 public class Client {
     private Socket socket;
     private ObjectOutputStream objectOutputStream;
@@ -32,6 +35,9 @@ public class Client {
         }
     }
 
+    /**
+     * Handles the exceptions by closing the client's socket
+     */
     public void closeEverything(){
         try {
             if (socket != null)
@@ -41,6 +47,9 @@ public class Client {
         }
     }
 
+    /**
+     * Spawns a thread whenever the client has to take turn
+     */
     public void takeTurn() {
         new Thread(() -> {
             ClientInput clientInput=null;
@@ -81,6 +90,9 @@ public class Client {
         }).start();
     }
 
+    /**
+     * This is the main thread, where the client listens for Inputs
+     */
     public void startListening(){
         new Thread(() -> {
             while(socket.isConnected()){
@@ -107,13 +119,14 @@ public class Client {
         }).start();
     }
 
-
+    /**
+     * Sends the client's input to the server {@link ClientHandler#readTurn(GameState)}
+     */
     public void updatePlayerState(ClientInput input){
         try{
             objectOutputStream.reset();
             objectOutputStream.writeObject(input);
             objectOutputStream.flush();
-
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -130,7 +143,6 @@ public class Client {
         Client client = new Client(socket , username);
 
         client.startListening();
-
     }
 
 

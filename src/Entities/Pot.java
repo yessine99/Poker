@@ -3,6 +3,9 @@ package Entities;
 import java.io.Serializable;
 import java.util.*;
 
+/**
+ * @deprecated
+ */
 public class Pot implements Serializable {
     private float potSize;
 

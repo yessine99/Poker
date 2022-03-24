@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.Objects;
 
 /**
- *  Class is for handling the client's moves ( check / call / raise / fold )
+ *  This class handles  the client's moves ( check / call / raise / fold )
  */
 public class ClientHandler{
 
@@ -69,7 +69,7 @@ public class ClientHandler{
     }
 
     /**
-     * method for reading the client's turn input
+     * Reads the client's inputs received from {@link Client#updatePlayerState(ClientInput)}
      * @param gameState updates the gameState depending on the player's action
      * @return returns fold by default
      * @throws IOException handled by {@link GameHandler#closeEverything(ClientHandler)}
