@@ -1,9 +1,10 @@
 package Entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Table {
+public class Table implements Serializable {
     private final float blinds;
     private final float minBuyIn;
     private final float maxBuyIn;

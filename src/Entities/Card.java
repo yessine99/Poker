@@ -1,8 +1,9 @@
 package Entities;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Card implements Comparable<Card> {
+public class Card implements Comparable<Card>, Serializable {
     private int value;
     private String suit;
 

@@ -1,8 +1,9 @@
 package Entities;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Pot {
+public class Pot implements Serializable {
     private float potSize;
 
     public Pot() {

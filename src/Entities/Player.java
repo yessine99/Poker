@@ -1,8 +1,9 @@
 package Entities;
 
+import java.io.Serializable;
 import java.util.Scanner;
 
-public class Player {
+public class Player implements Serializable {
 
     private int id;
     private final Hand hand = new Hand();
@@ -25,6 +26,38 @@ public class Player {
         chips=id*10000;
         potContribution=0;
         currentBet=0;
+    }
+
+    public void setHasPlayed(boolean hasPlayed) {
+        this.hasPlayed = hasPlayed;
+    }
+
+    public void setChips(float chips) {
+        this.chips = chips;
+    }
+
+    public void setAllIn(boolean allIn) {
+        isAllIn = allIn;
+    }
+
+    public void setCurrentBet(float currentBet) {
+        this.currentBet = currentBet;
+    }
+
+    public void setPotContribution(float potContribution) {
+        this.potContribution = potContribution;
+    }
+
+    public void setHasFolded(boolean hasFolded) {
+        this.hasFolded = hasFolded;
+    }
+
+    public boolean isHasPlayed() {
+        return hasPlayed;
+    }
+
+    public boolean isHasFolded() {
+        return hasFolded;
     }
 
     public int getId() {
@@ -60,6 +93,8 @@ public class Player {
     }
 
 
+
+
     public void initForNextRound(){
         hasPlayed = false;
         potContribution += currentBet;
@@ -89,7 +124,7 @@ public class Player {
     public float raise(float prevBet){
         float amount;
         Scanner input = new Scanner(System.in);
-        System.out.print("Amount :"+prevBet*2+" + :");
+        System.out.print("Amount :$"+prevBet*2+" + :");
         amount = input.nextFloat()+prevBet*2;
 
         if (amount - currentBet >=chips){
@@ -102,7 +137,7 @@ public class Player {
             chips -= amount - currentBet;
             currentBet = amount;
         }
-        System.out.println(currentBet);
+        System.out.println("--> $"+currentBet);
         hasPlayed=true;
         return currentBet;
     }

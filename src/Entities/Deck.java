@@ -3,9 +3,10 @@ package Entities;
 import Enums.CardSuit;
 import Enums.CardValue;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Deck {
+public class Deck implements Serializable {
     private final List<Card> deck = new ArrayList<>();
 
     public  Deck(){

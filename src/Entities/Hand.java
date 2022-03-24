@@ -3,9 +3,10 @@ package Entities;
 
 import Enums.Rank;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Hand implements Comparable<Hand>{
+public class Hand implements Comparable<Hand> , Serializable {
     private final List<Card> hand = new ArrayList<>();
     private double score;
 
